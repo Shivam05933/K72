@@ -8,7 +8,7 @@ const HomeHeroText = () => {
       <div className=' lg:text-[9.5vw] lg:leading-[8vw] flex items-center justify-center text-[6.5vh] leading-12'> 
         ALL 
         <div className=' lg:h-[15vh] lg:w-[15vw] lg:-mt-3 rounded-full overflow-hidden h-10 w-25 '> <Video /> </div>
-         THINGS
+        THINGS
       </div>
       <div className=' lg:text-[9.5vw] lg:leading-[8vw] flex items-center justify-center text-[6.5vh] leading-12'>CREATIVE</div>
     </div>

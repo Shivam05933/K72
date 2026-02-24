@@ -17,3 +17,7 @@ createRoot(document.getElementById('root')).render(
     </BrowserRouter>
   </StrictMode>,
 )
+
+// stairs ka child <App /> hai 
+// <App/> ko esliye child banaya gaya hai jisse ki jab stairs vala animation run ho jaye uske baad pura app chale 
+// <App /> App ko child bana ke stair.jsx me gsap ke through delay kar diya gaya hai 

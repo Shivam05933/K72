@@ -31,4 +31,4 @@ const NavContext = ({children}) => {
   )
 }
 
-export default NavContext
+export default NavContext 
