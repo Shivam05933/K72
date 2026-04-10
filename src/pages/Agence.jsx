@@ -1,11 +1,11 @@
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
+import { ScrollToPlugin } from 'gsap/ScrollToPlugin';
 import React, { useRef, useLayoutEffect } from 'react'
 
 gsap.registerPlugin(ScrollTrigger);
-
+gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
 const Agence = () => {
 
   const imageDivRef = useRef(null);
@@ -14,7 +14,8 @@ const Agence = () => {
   const page1ImgRef = useRef(null)
   const page2ImgRef = useRef(null)
   const page2Ref = useRef(null)
-
+  const containerRef = useRef(null);
+  const cardRefs = useRef([]);
 
   // images ka array hai 
   const imageArray = [
@@ -95,17 +96,10 @@ const Agence = () => {
           repeat: -1
         }
       );
-    })
-
-    // Second Page scroll animation
-
-
-
-
-
+    });
 
   });
-
+  
   useGSAP(() => {
   // 1. First Page ki image ko pin karne ke liye
   gsap.to(page1ImgRef.current, {
@@ -133,6 +127,59 @@ const Agence = () => {
   });
 
 }, { scope: blackPageRef });
+
+/////////////////// STACK ANIMATION COMPONENT /////////////////
+
+useGSAP(() => {
+  const cards = cardRefs.current;
+  const tl = gsap.timeline({
+    scrollTrigger: {
+      trigger: containerRef.current,
+      start: "top top",
+      end: "+=400%", 
+      scrub: 1,
+      pin: true,
+    }
+  });
+
+  cards.forEach((card, index) => {
+    if (index === 0) return;
+
+    const isLastCard = index === cards.length - 1; // Check if it's the 50% footer
+
+    // 1. Current card ko upar lana
+    tl.to(card, { 
+      y: "0%", // Last card ke liye direct 0%
+      ease: "none",
+      duration: 1
+    }, index); 
+
+    // 2. Pichli (Previous) card ka animation
+    tl.to(cards[index - 1], {
+      // AGAR LAST CARD HAI TO SCALE 1 RAKHO (MATLAB CHOTA NAHI HOGA)
+      scale: isLastCard ? 1 : 0.85, 
+      
+      // AGAR LAST CARD HAI TO THODA ZYADA DARK KARO TAAKI FOOTER DIKHE
+      opacity: isLastCard ? 0.4 : 0.3, 
+      
+      // OPTIONAL: Last transition pe thoda blur daal sakte ho
+      filter: isLastCard ? "blur(20px)" : "blur(10px)",
+      
+      duration: 1,
+      ease: "none"
+    }, index);
+  });
+
+}, { scope: containerRef });
+
+// esme BACK TO TOP ka logic hai
+const handleBackToTop = () => {
+  gsap.to(window, {
+    duration: 2,         // Kitni der mein upar pahunchna hai (seconds)
+    scrollTo: 0,         // 0 matlab page ka start
+    ease: "power4.inOut" // Smooth start aur smooth end ke liye
+  });
+};
 
   return (
     <div className='overflow-x-hidden'>
@@ -215,7 +262,87 @@ const Agence = () => {
             <p className='font-[font2] text-3xl whitespace-nowrap pt-12'>OPERATIONS AND BSUINESS DEVELOPMENT </p>
           </div>
         </div>
+      
+{/* --- STACK ANIMATION SECTION (Opto, OKA, etc.) --- */}
+<div ref={containerRef} className="relative h-screen w-full overflow-hidden bg-black mt-20">
+  
+  {/* Card 1: Base - Ye hamesha top: 0 pe rahega */}
+  <div ref={(el) => (cardRefs.current[0] = el)} className="absolute top-0 left-0 w-full h-screen z-10 bg-zinc-900 ">
+    <img className="w-full h-full object-cover " src="https://k72.ca/images/caseStudies/Opto/thumbnailimage_opto.jpg?w=1280&h=960&s=938f0bfb3de1ff2a2846b884eec2d757" alt="" />
+    <div className="absolute inset-0 flex flex-col justify-center items-center text-white text-center bg-black/40">
+      <h2 className="text-4xl font-medium">Opto-Reseau</h2>
+      <a className="text-7xl pt-4 font-medium underline cursor-pointer font-[font2]">We see you like no other</a>
+    </div>
+  </div>
 
+  {/* Card 2 */}
+  <div ref={(el) => (cardRefs.current[1] = el)} className="absolute top-0 left-0 w-full h-screen z-20 translate-y-full bg-zinc-800 border-t border-white/10 shadow-2xl rounded-t-[40px] overflow-hidden">
+    <img className="w-full h-full object-cover object-top" src="https://k72.ca/images/teamMembers/Michele_480X640.jpg?w=480&h=640&fit=crop&s=ce85dc6d140947736baa739d0e59dab2" alt="" />
+    <div className="absolute inset-0 flex flex-col justify-center items-center text-white text-center bg-black/40">
+      <h2 className="text-4xl font-medium">OKA</h2>
+      <a className="text-7xl pt-4 font-medium underline cursor-pointer font-[font2]">Authentic tradition</a>
+    </div>
+  </div>
+
+  {/* Card 3 */}
+  <div ref={(el) => (cardRefs.current[2] = el)} className="absolute top-0 left-0 w-full h-screen z-30 translate-y-full bg-zinc-700 border-t border-white/10 shadow-2xl rounded-t-[40px] overflow-hidden">
+    <img className="w-full h-full object-cover object-top" src="https://k72.ca/images/teamMembers/MEGGIE_480X640_2.jpg?w=480&h=640&fit=crop&s=3604b19f8fc7b40f517954147698d847" alt="" />
+    <div className="absolute inset-0 flex flex-col justify-center items-center text-white text-center bg-black/40">
+      <h2 className="text-4xl font-medium">Shelton</h2>
+      <a className="text-7xl pt-4 font-medium  underline cursor-pointer font-[font2]">Precision engineering</a>
+    </div>
+  </div>
+
+  {/*///////////////////////////////////* Card 4: Contact Us */}
+{/* Last Card: Footer Section */}
+<div 
+  ref={(el) => (cardRefs.current[3] = el)} 
+  className="absolute bottom-0 left-0 w-full h-1/2 z-50 translate-y-full rounded-t-[40px] overflow-hidden bg-black text-white flex flex-col justify-between py-4 px-6 font-sans"
+>
+  
+  {/* 1. TOP SECTION (Icons + Contact Button) */}
+  <div className="flex justify-between items-center w-full">
+    {/* Left: Social Icons */}
+    <div className="flex gap-3">
+      {["FB", "IG", "IN", "BE"].map((item) => (
+        <div key={item} className="border-[1.5px] border-white px-6 py-2 rounded-full text-4xl font-bold tracking-tighter hover:bg-white hover:text-black transition-all cursor-pointer">
+          {item}
+        </div>
+      ))}
+    </div>
+
+    {/* Right: Contact Button */}
+    <div className="flex items-center gap-3 border-[1.5px] border-white px-8 py-2 rounded-full text-4xl font-bold tracking-tighter cursor-pointer hover:bg-white hover:text-black transition-all group">
+      <span>CONTACT</span>
+      <span className="text-4xl group-hover:scale-125 transition-transform">♥</span>
+    </div>
+  </div>
+
+  {/* 2. BOTTOM SECTION (Clock + Links) */}
+  <div className="w-full flex justify-between items-end border-t border-white/20   pt-6">
+    {/* Left Side Info */}
+    <div className="flex items-center gap-2 text-sm font-medium">
+      <span className="opacity-100 text-lg">🌐</span>
+      <span className="tracking-widest">MONTREAL_06:03:57</span>
+    </div>
+
+    {/* Center Links */}
+    <div className="flex gap-10 text-[13px] font-bold tracking-[0.2em] opacity-80 ">
+      <span className="hover:opacity-100 cursor-pointer ">PRIVACY POLICY</span>
+      <span className="hover:opacity-100 cursor-pointer">PRIVACY NOTICE</span>
+      <span className="hover:opacity-100 cursor-pointer">ETHICS REPORT</span>
+      <span className="hover:opacity-100 cursor-pointer">CONSENT CHOICES</span>
+    </div>
+
+    {/* Right Side Info */}
+    <div onClick={handleBackToTop} className="text-[15px] text-[#D3FD50] font-bold tracking-[0.1em] opacity-80 hover:opacity-100 cursor-pointer">
+      BACK TO TOP
+    </div>
+  </div>
+
+</div>
+
+</div>
 
         
       </div>
