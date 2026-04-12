@@ -3,6 +3,7 @@ import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import ProjectCard from '../components/Project/ProjectCard'
+import Footer from '../components/common/Footer';
 
 const Project = () => {
 
@@ -53,6 +54,8 @@ const Project = () => {
           </div>
         })}
       </div>
+
+      <Footer className="w-full h-[50vh]" />
 
     </div>
   )
